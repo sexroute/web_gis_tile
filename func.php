@@ -45,7 +45,7 @@ function create_tile($source_path,$z){
     $source_height = $source_info[1];
 
 
-    $path = __DIR__.'/nativegis2/' . $z.'/';
+    $path = __DIR__.'/tile/' . $z.'/';
 
 
     if (!file_exists($path)) { //层级
@@ -67,7 +67,7 @@ function create_tile($source_path,$z){
     for ($x = 0; $x <$rows; $x++) {  //行
 
 
-        $path = __DIR__ . '/nativegis2/' . $z . '/' . $x . '/';
+        $path = __DIR__ . '/tile/' . $z . '/' . $x . '/';
 
         if (!file_exists($path)) {
 
@@ -77,7 +77,7 @@ function create_tile($source_path,$z){
 
         for ($y = 0; $y <=(pow(2,$z)-1); $y++) {  //瓦片图
 
-            $img_path= __DIR__.'/nativegis2/' . $z.'/'.$x.'/'.$y.'.png';
+            $img_path= __DIR__.'/tile/' . $z.'/'.$x.'/'.$y.'.png';
 
             $source_x=$x*256; //列宽
             $source_y=$y*256; //行高
@@ -117,8 +117,6 @@ function create_tile($source_path,$z){
                 imagedestroy($source_image);
                 imagedestroy($target_image);
             }
-
-
         }
 
     }

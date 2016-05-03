@@ -8,8 +8,7 @@
 include 'worker.php';
 set_time_limit(0);
 
-//切图层级
-define('DEFAULT_LEVEL',7);
+define('DEFAULT_LEVEL',4);
 
 /*
  * 1.读取源图,计算出原图的缩放等级:$level=>ceil(高度/256),
@@ -31,7 +30,7 @@ $source_info   = getimagesize($source_path);
 
 $source_width  = $source_info[0];
 $source_height = $source_info[1];
-$source_ratio  = $source_width/$source_height; //
+$source_ratio  = $source_height/$source_width; //
 
 $level=ceil($source_height/256);
 
@@ -69,6 +68,8 @@ if(!file_exists($root)){
 //对原图进行缩放处理
 for($i=0;$i<$level;$i++){
 
+
+
     $target_path=$root.$i.'.png';
 
     $target__test_path=$root.($i-1).'.png';
@@ -93,12 +94,12 @@ for($i=0;$i<$level;$i++){
     if($i==0){
 
         $target_width=256;
-        $target_height=256*$source_height/$source_width;
+        $target_height=256*$source_ratio;
 
     }else{
 
-        $target_width=256+$i*256*$source_ratio;
-        $target_height=256+$i*256;
+        $target_width=256+$i*256;
+        $target_height=(256+$i*256)*$source_ratio;
     }
 
 
@@ -122,6 +123,7 @@ for($i=0;$i<$level;$i++){
 }
 
 
+
 $tmp=array();
 
 $work_tile_map=array();
@@ -138,13 +140,11 @@ for($z=0;$z<$level;$z++){
 }
 
 
-/**
- * Todo 进行多进程调用,待完善
- */
+//循环切图
 foreach($work_tile_map as $val){
 
     create_tile($val['sourse_path'],$val['z']);
 
-    echo "done...<br/>";
+    echo "done...";
 
 }
