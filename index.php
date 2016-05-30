@@ -19,7 +19,7 @@ define('DEFAULT_LEVEL',4);
 
 
 //1
-$source_path="./ditu.png";
+$source_path="./ditie.png";
 
 if(!file_exists($source_path)){
 
@@ -31,8 +31,6 @@ $source_info   = getimagesize($source_path);
 $source_width  = $source_info[0];
 $source_height = $source_info[1];
 $source_ratio  = $source_height/$source_width; //
-
-$level=ceil($source_height/256);
 
 
 //临时图层目录处理
@@ -64,62 +62,31 @@ if(!file_exists($root)){
 }
 
 
-
 //对原图进行缩放处理
+$level=5;
+
 for($i=0;$i<$level;$i++){
 
-
-
     $target_path=$root.$i.'.png';
-
-    $target__test_path=$root.($i-1).'.png';
-
-    //如果已经到达最大分辨率,则停止处理
-    if(file_exists($target__test_path)){
-
-        $source__test_info   = getimagesize($target__test_path);
-        $tmp_source_height  = $source__test_info[1];
-
-        if($tmp_source_height>=256*DEFAULT_LEVEL){
-
-            $level=ceil($tmp_source_height/256); //调整level级别
-            break;
-        }
-
-    }
-
-    $source_image = imagecreatefrompng($source_path);
-
 
     if($i==0){
 
         $target_width=256;
-        $target_height=256*$source_ratio;
+
+    }elseif($i==1){
+
+        $target_width=512;
 
     }else{
 
-        $target_width=256+$i*256;
-        $target_height=(256+$i*256)*$source_ratio;
+        $l=pow(2,$i);
+
+        $target_width=256*$l;
     }
 
+    $target_height=$source_height*$target_width/$source_width;
 
-    $target_image  = imagecreatetruecolor($target_width, $target_height); //创建图片对象
-    imagesavealpha($target_image, true);
-    $trans_colour = imagecolorallocatealpha($target_image, 0, 0, 0, 127);
-    imagefill($target_image, 0, 0, $trans_colour);
-
-    imagecopyresampled($target_image, $source_image, 0, 0, 0, 0, $target_width, $target_height, $source_width,$source_height);
-
-    if (!file_exists($root)) {
-
-        @mkdir($root);
-    }
-
-    imagepng($target_image,$target_path);
-
-    imagedestroy($source_image);
-    imagedestroy($target_image);
-
+    resize('./',$root,'ditie.png',$i.'.png',$target_width,$target_height);
 }
 
 
@@ -138,7 +105,6 @@ for($z=0;$z<$level;$z++){
         'sourse_path'=>$source_path
     );
 }
-
 
 //循环切图
 foreach($work_tile_map as $val){

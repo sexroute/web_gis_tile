@@ -6,14 +6,6 @@
  * Time: 12:01
  */
 
-function dump($info){
-
-    echo '<pre>';
-    print_r($info);
-    echo '</pre>';
-
-}
-
 //得到某一层级的行数
 function get_rows($level){
 
@@ -39,11 +31,8 @@ function create_tile($source_path,$z){
 
     }
 
-    $source_info   = getimagesize($source_path);
 
-    $source_width  = $source_info[0];
-    $source_height = $source_info[1];
-
+    list($source_width, $source_height, $or_t) = getimagesize($source_path);
 
     $path = __DIR__.'/tile/' . $z.'/';
 
@@ -63,6 +52,7 @@ function create_tile($source_path,$z){
     }
 
     $rows=get_rows($z+1); //层级比行标号大1
+
 
     for ($x = 0; $x <$rows; $x++) {  //行
 
@@ -120,4 +110,65 @@ function create_tile($source_path,$z){
         }
 
     }
+}
+
+function resize($dir, $newdir, $img, $newimg, $max_w, $max_h, $th_x = '', $th_y = '', $th_w = '', $th_h = '',$cut = FALSE,$center = FALSE)
+{
+
+    // set destination directory
+    if (!$newdir) $newdir = $dir;
+    if (!$newimg) $newimg = $img;
+
+    // get original images width and height
+    list($or_w, $or_h, $or_t) = getimagesize($dir.$img);
+
+    switch($or_t){
+
+        // original image
+        case 1:
+            $or_image = imagecreatefromgif($dir.$img);
+            break;
+        case 2:
+            $or_image = imagecreatefromjpeg($dir.$img);
+            break;
+        case 3:
+            $or_image = imagecreatefrompng($dir.$img);
+            break;
+        default:
+            return '不支持的图像格式';
+        break;
+
+    }
+
+
+    $ratio = ($max_h / $max_w);
+
+
+    if ($or_w > $max_w || $or_h > $max_h) {
+
+        // resize by height, then width (height dominant)
+        if ($max_h < $max_w) {
+            $rs_h = $max_h;
+            $rs_w = $rs_h / $ratio;
+        }
+
+        // resize by width, then height (width dominant)
+        else {
+            $rs_w = $max_w;
+            $rs_h = $ratio * $rs_w;
+        }
+
+        // copy old image to new image
+        $rs_image = imagecreatetruecolor($rs_w, $rs_h);
+        imagecopyresampled($rs_image, $or_image, 0, 0, 0, 0, $rs_w, $rs_h, $or_w, $or_h);
+
+    } else { // image requires no resizing
+        $rs_w = $or_w;
+        $rs_h = $or_h;
+        $rs_image = $or_image;
+    }
+
+    imagepng($rs_image,$newdir.$newimg);
+
+    @ImageDestroy($rs_image);
 }
